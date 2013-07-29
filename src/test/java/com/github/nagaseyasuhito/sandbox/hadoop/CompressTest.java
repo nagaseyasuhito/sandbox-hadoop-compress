@@ -26,8 +26,7 @@ public class CompressTest {
 		writer.close();
 	}
 
-	private void read(String path) throws Throwable {
-		Configuration conf = new Configuration();
+	private void read(String path, Configuration conf) throws Throwable {
 		RCFile.Reader reader = new RCFile.Reader(FileSystem.get(conf), new Path("file://" + path), conf);
 
 		while (reader.next(new LongWritable())) {
@@ -41,7 +40,7 @@ public class CompressTest {
 		Configuration conf = new Configuration();
 
 		this.write(path.getPath(), conf, null);
-		this.read(path.getPath());
+		this.read(path.getPath(), conf);
 	}
 
 	@Test
@@ -51,6 +50,15 @@ public class CompressTest {
 		conf.setBoolean(CommonConfigurationKeysPublic.IO_NATIVE_LIB_AVAILABLE_KEY, false);
 
 		this.write(path.getPath(), conf, new GzipCodec());
-		this.read(path.getPath());
+		this.read(path.getPath(), conf);
+	}
+
+	@Test
+	public void withGzipCodec() throws Throwable {
+		File path = File.createTempFile("hadoop", ".gz");
+		Configuration conf = new Configuration();
+
+		this.write(path.getPath(), conf, new GzipCodec());
+		this.read(path.getPath(), conf);
 	}
 }
